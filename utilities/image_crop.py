@@ -1,7 +1,8 @@
+"""Module containing functions to crop an image"""
 import numpy as np
 
 
-def crop_image(
+def image_crop(
     image: np.ndarray,
     x1: int = None,
     y1: int = None,
