@@ -1,7 +1,11 @@
 """Module containing functions to crop an image"""
 import numpy as np
 
-
+# x1,y1 --w---
+# |          |
+# h          |
+# |          |
+# --------x2,y2
 def image_crop(
     image: np.ndarray,
     x1: int = None,

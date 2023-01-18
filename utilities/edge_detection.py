@@ -6,13 +6,16 @@ better readability and self-explanation."""
 
 import cv2
 import numpy as np
+from copy import deepcopy
 
 
 def extract_contours(
-    image: np.ndarray, lower_threshold: int, upper_threshold: int, show_contours: bool=False
+    image: np.ndarray, lower_threshold: int, upper_threshold: int, show_contours: bool = False
 ) -> tuple[np.ndarray, list[np.ndarray], list[np.ndarray]]:
     """
-    Extracts the contours of the white lines in an image using Hough lines algorithm, and returns the image with the contours and the corner points of the rectangle(s) in the image.
+    Extracts the contours of the white lines in an image using Hough lines algorithm, and returns the
+    image with the contours and the corner points of the rectangle(s) in the image.
+    Hough explained: https://www.youtube.com/watch?v=4zHbI-fFIlI
 
     Parameters:
         image (np.ndarray): Input image.
@@ -26,22 +29,59 @@ def extract_contours(
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     _ret, thresh = cv2.threshold(gray, lower_threshold, upper_threshold, cv2.THRESH_BINARY)
     contours, _ = cv2.findContours(thresh, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
-    cv2.drawContours(image, contours, -1, (0, 255, 0), 2)
+
+    # THis works well on frame 1
+    _ret, thresh = cv2.threshold(gray, 165, 165, cv2.THRESH_BINARY)
+    edges = cv2.Canny(thresh, 200, 200)
+    cv2.imshow("detected thresh", thresh)
+    cv2.imshow("detected canny", edges)
+    for idx, img in enumerate([thresh, edges]):
+        copied_img = deepcopy(image)
+        lines2 = cv2.HoughLinesP(
+            image=img,  #
+            rho=1,  # The resolution of the parameter r in pixels. We use 1 pixel
+            theta=np.pi
+            / 180,  # The resolution of the parameter θ in radians. We use 1 degree (CV_PI/180
+            threshold=90,  # The minimum number of intersections to "*detect*" a line
+            lines=1,  # A vector that will store the parameters (xstart,ystart,xend,yend) of the detected line
+            minLineLength=100,  # The minimum number of points that can form a line. Lines with less than this number of points are disregarded.
+            maxLineGap=15,  # The maximum gap between two points to be considered in the same line.
+        )
+        if lines2 is not None:
+            for i in range(0, len(lines2)):
+                l = lines2[i][0]
+                cv2.line(copied_img, (l[0], l[1]), (l[2], l[3]), (0, 0, 255), 3, cv2.LINE_AA)
+        cv2.imshow(f"detected contours {idx}", copied_img)
 
     # Find the rectangle corner points: try a naive and a hough-based approach
     rectangles, rectangles_hough = [], []
+    min_area = 1000  # set minimum area threshold
     for contour in contours:
         if len(contour) >= 4:
             rect = cv2.minAreaRect(contour)
-            rectangles.append(cv2.boxPoints(rect))
+            rect_points = cv2.boxPoints(rect)
+            area = cv2.contourArea(rect_points)
+            if area > min_area:
+                rectangles.append(rect_points)
             # Find lines in the contour
             points = contour.reshape(-1, 2).astype(np.uint8)
-            lines = cv2.HoughLinesP(points, 1, np.pi / 180, 100, minLineLength=100, maxLineGap=10)
+            lines = cv2.HoughLinesP(
+                image=points,
+                rho=1,
+                theta=np.pi / 180,
+                threshold=None,
+                minLineLength=100,
+                maxLineGap=10,
+            )
             if lines is not None:
                 # Find the corner points of the rectangle
                 corners = find_rectangle_corners(lines)
                 if len(corners) == 4:
                     rectangles.append(corners)
+    # cv2.drawContours(image, contours, -1, (0, 255, 0), 2)
+    for line in lines:
+        x1, y1, x2, y2 = line[0]
+        cv2.line(image, (x1, y1), (x2, y2), (0, 255, 0), 2)
     if show_contours:
         cv2.imshow("detected contours", image)
 
