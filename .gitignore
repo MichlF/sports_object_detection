@@ -138,3 +138,7 @@ dmypy.json
 
 # Model objects
 *.pt
+
+# Specific and large folders
+/tryouting
+/models
