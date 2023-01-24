@@ -14,6 +14,12 @@ python -c "import tensorflow as tf; print(tf.config.list_physical_devices('GPU')
 
 
 def init_gpu_tpu():
+    """
+    This function initializes the GPU/TPU and sets the global mixed precision policy. If TPUs
+    are detected, it sets the policy to 'mixed_bfloat16' and if GPUs are detected, it sets the
+    policy to 'mixed_float16' and selects the first GPU for usage. If no TPUs or GPUs are
+    detected, it prints a message indicating so.
+    """
     # Use mixed precision policy if TPU/GPUs are detected for additional performance boost
     # see https://www.tensorflow.org/guide/mixed_precision
     if experimental.list_physical_devices("TPU"):  # Googles Tensor Processing Units

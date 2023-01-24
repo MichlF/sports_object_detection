@@ -13,7 +13,16 @@ def read_video(
     *args,
     **kwargs,
 ):
-    """Reads in and shows a video (continuously or frame-by-frame). Allows storing each frame as image."""
+    """
+    Reads in and shows a video (continuously or frame-by-frame). Allows storing each frame as image.
+    Args:
+        video_path (str): The path of the video to be read.
+        show_frames (bool): Whether or not to show the frames of the video. Default is True.
+        frame_by_frame (bool): Whether to show the frames one by one, pausing after each. Default is False.
+        save_frame (bool): Whether to save each frame of the video as an image. Default is False.
+        *args: Additional arguments to be passed to `cv2.imwrite` when saving frames.
+        **kwargs: Additional keyword arguments to be passed to `cv2.imwrite` when saving frames.
+    """
     video = cv2.VideoCapture(video_path)
     if save_frame:
         output_folder = Path("output_frames")
@@ -32,7 +41,7 @@ def read_video(
             cv2.imwrite(f"output_frames/frame{frame_count}.jpg", frame, *args, **kwargs)
             frame_count += 1
         # Exit the loop if the user presses the 'q' key
-        if cv2.waitKey(0) & 0xFF == ord("q"):  # exit with q
+        if cv2.waitKey(0) & 0xFF == ord("q"):
             cv2.destroyAllWindows()
             raise KeyError("You have stopped the simulation!")
         elif frame_by_frame and cv2.waitKey(0) & 0xFF == ord(" "):  # frame by frame with other key
@@ -50,6 +59,16 @@ def resize_moviepy(
     *args,
     **kwargs,
 ):
+    """
+    Resize a video using moviepy.
+    Args:
+        input_path (str): The path of the input video.
+        output_path (str): The path of the output video.
+        resolution_height (int): The height of the output video. Default is 640.
+        resolution_width (int): The width of the output video. Default is 640.
+        *args: Additional arguments to be passed to `video.resize`
+        **kwargs: Additional keyword arguments to be passed to `video.resize`
+    """
     video = VideoFileClip(input_path)
     resized_video = video.resize(height=resolution_height, width=resolution_width, *args, **kwargs)
     resized_video.write_videofile(output_path)
@@ -63,13 +82,21 @@ def resize_opencv(
     *args,
     **kwargs,
 ):
-    # Open the video
+    """
+    Resize a video using OpenCV
+    Args:
+        input_path (str): The path of the input video.
+        output_path (str): The path of the output video.
+        resolution_height (int): The height of the output video. Default is 640.
+        resolution_width (int): The width of the output video. Default is 640.
+        *args: Additional arguments to be passed to `cv2.resize`
+        **kwargs: Additional keyword arguments to be passed to `cv2.resize`
+    """
     cap = cv2.VideoCapture(input_path)
     # Get the frames per second (fps) and codec info from the video
     fps = int(cap.get(cv2.CAP_PROP_FPS))
     fourcc = int(cap.get(cv2.CAP_PROP_FOURCC))
     out = cv2.VideoWriter(output_path, fourcc, fps, (resolution_height, resolution_width))
-
     # Start the loop with a progress bar
     frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     for _ in tqdm(range(frame_count)):
