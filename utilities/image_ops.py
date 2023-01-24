@@ -1,11 +1,7 @@
 """Module containing functions to crop an image"""
 import numpy as np
 
-# x1,y1 --w---
-# |          |
-# h          |
-# |          |
-# --------x2,y2
+
 def image_crop(
     image: np.ndarray,
     x1: int = None,
@@ -22,6 +18,11 @@ def image_crop(
     ] = None,
 ) -> np.ndarray:
     """Crops a rectangle out of a given image. Accepts coordinates from a Tensor box from YOLO."""
+    # x1,y1 --w---
+    # |          |
+    # h          |
+    # |          |
+    # --------x2,y2
     if tensor_box_xywh is not None:
         x1 = int(tensor_box_xywh[0])
         y1 = int(tensor_box_xywh[1])
