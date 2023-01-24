@@ -127,3 +127,18 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Video folder
+/video
+
+# video and image files
+*.mp4
+*.jpg
+*.jpeg
+
+# Model objects
+*.pt
+
+# Specific and large folders
+/tryouting
+/models
