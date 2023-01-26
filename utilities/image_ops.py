@@ -1,6 +1,5 @@
 import numpy as np
 
-
 def image_crop(
     image: np.ndarray,
     x1: int = None,
@@ -53,3 +52,45 @@ def image_crop(
         x1 = int(x1 - width / 2)
         y1 = int(y1 - height / 2)
         return image[y1 : y1 + height, x1 : x1 + width]
+
+
+def pixels_to_real(distance_px: int, reference_len_px: int, reference_len_world: float):
+    """
+    Convert a distance from pixels to real-world units.
+
+    This function converts a distance measured in pixels to real-world units by using a reference length that is known in both pixels and real-world units.
+
+    Args:
+    distance_px (int): The distance to be converted, measured in pixels.
+    reference_len_px (int): The length of a reference object or line in pixels.
+    reference_len_world (float): The length of the same reference object or line in real-world units.
+
+    Returns:
+    float: The converted distance in real-world units.
+
+    Note:
+    The function assumes that the reference_len_px and reference_len_world values are representative of the entire image or video.
+    """
+    conversion_factor = reference_len_world / reference_len_px
+    return distance_px * conversion_factor
+
+
+def real_to_pixels(distance_real: float, reference_len_px: int, reference_len_world: float):
+    """
+    Convert a distance from real-world units to pixels.
+
+    This function converts a distance measured in real-world units to pixels by using a reference length that is known in both pixels and real-world units.
+
+    Args:
+    distance_real (float): The distance to be converted, measured in real-world units.
+    reference_len_px (int): The length of a reference object or line in pixels.
+    reference_len_world (float): The length of the same reference object or line in real-world units.
+
+    Returns:
+    int: The converted distance in pixels.
+
+    Note:
+    The function assumes that the reference_len_px and reference_len_world values are representative of the entire image or video.
+    """
+    conversion_factor = reference_len_px / reference_len_world
+    return distance_real * conversion_factor

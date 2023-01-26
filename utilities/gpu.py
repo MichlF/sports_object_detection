@@ -6,10 +6,14 @@ from tensorflow.config import experimental, list_physical_devices
 Install tensorflow gpu support as win native. But note that this is not compatible with 
 the most recent PyTorch version and thus won't work with YOLOv8:
 conda install -c conda-forge cudatoolkit=11.2 cudnn=8.1.0
+# Or better
+conda install -c conda-forge cudatoolkit-dev cudnn=8.1.0
 # Anything above 2.10 is not supported on the GPU on Windows Native
 python -m pip install "tensorflow<2.11"
 # Verify install:
 python -c "import tensorflow as tf; print(tf.config.list_physical_devices('GPU'))"
+# PyTorch
+pip install torch==1.10.0+cu111 torchvision==0.11.0+cu111 torchaudio==0.10.0 -f https://download.pytorch.org/whl/torch_stable.html
 """
 
 

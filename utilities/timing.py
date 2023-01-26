@@ -2,7 +2,7 @@ import functools
 from time import perf_counter
 
 
-def timer(enabled: bool = True, decimal_places: int = 3):
+def timer(enabled: bool = True, decimal_places: int = 4):
     """
     A function decorator that times the execution of the decorated function and prints the time taken.
 
