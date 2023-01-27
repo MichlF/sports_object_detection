@@ -136,9 +136,8 @@ dmypy.json
 *.jpg
 *.jpeg
 
-# Model objects
-*.pt
-
 # Specific and large folders
 /tryouting
-/models
+*.1
+*.2
+reqs_conda.txt
