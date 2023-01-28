@@ -2,13 +2,13 @@
 
 <h1 align="center">
   <br>
-  <img src="https://raw.githubusercontent.com/MichlF/sports_object_detection/tree/main/readme_images/tennis.png" title="From Flaticon Those Icons" alt="From Flaticon Those Icons" width="75"></a>
+  <img src="https://github.com/MichlF/sports_object_detection/raw/main/images/tennis.png" title="Image taken from Flaticon: Those Icons" alt="From Flaticon Those Icons" width="75"></a>
   <br>
   Object Detection in Sports
   <br>
 </h1>
 
-<h4 align="center">A Tennis tracker project.</h4>
+<h4 align="center">— A Tennis match tracking project —</h4>
 
 <h1 align="center">
 
@@ -32,13 +32,14 @@
     <a href="https://github.com/MichlF/sports_object_detection/issues">Request Feature</a>
 </p>
 
-![screenshot](https://raw.githubusercontent.com/MichlF/sports_object_detection/tree/main/readme_images/demo.gif)
+![screenshot](https://raw.githubusercontent.com/MichlF/sports_object_detection/raw/main/images/demo.gif)
 
 ## Key Features
 
 * Detects the players and the tennis ball in a given video
 * Tracks player and ball positions and stores them for later analysis
-* Ticker-style recreation of the match onto a top-view minimap
+* Provides and stores some simple stroke statistics for later analysis
+* Ticker-styled recreation of the match: play action projected onto a top-view minimap
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -62,7 +63,7 @@ python main.py
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-## How it works
+## How It Works
 
 EMPTY
 
@@ -78,19 +79,19 @@ The following features are in the making ([contributions welcome !](#contributin
 - [ ] Implement saving the ball trajectory and player path to .csv
 - [ ] Provide additional metrics
   - [ ] Provide a counter for the number of ball bounces
-  - [ ] Provide a counter for the number of strokes
   - [ ] Calculate speed for each ball stroke
-- [ ] Allow passing arguments overriding config arguments when running from CLI
-- [ ] Instead of using TrackNet, create a custom dataset and train YOLO to detect the tennis ball reliably
-- [ ] Add transformations for video footage with a moving camera
+  - [ ] Provide a counter for the number of strokes
+- [ ] Allow passing arguments from CLI that override config arguments
+- [ ] Instead of using TrackNet, create a custom dataset and train YOLO to detect the tennis ball reliably. This is likely to massively increase performance as TrackNet accounts for almost 80% of the total processing time.
+- [ ] Add transformations for video footage with a moving camera (perspective)
 - [ ] Improve player vs. non-player detection 
 - [ ] Provide code adaptations to fully support other sports
 
 ### Limitations  
 
-Because we only have a single camera, certain information, such as depth or height of an object, cannot be reliably inferred. This makes the match recreation on the minimap and certain (physical) metrics inaccurate. Similarly, everything hinges on accuracy of court line and general object detection which means that the quality of your video footage is a major determinant of the output quality ("garbage in, garbage out").
+Because we only have a single camera, certain information, such as depth or height of an object, cannot be reliably inferred. This makes the match recreation on the minimap and certain (physical) metrics inaccurate. Similarly, everything hinges on accuracy of court line and general object detection which means that the quality of your video footage is a major determinant of the output quality (think "garbage in, garbage out").
 
-### More features? Problems? Bugs?  
+### More features? Problems or bugs?  
 See the [open issues](https://github.com/MichlF/sports_object_detection/issues) for a full list of proposed features and known issues.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>

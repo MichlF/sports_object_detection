@@ -111,3 +111,18 @@ def resize_opencv(
     # Release the video capture and output objects
     cap.release()
     out.release()
+
+def mp4_to_gif_opencv(path_to_mp4, path_to_gif, start_frame, duration_seconds, fps):
+    vid = cv2.VideoCapture(path_to_mp4)
+    frames = []
+    vid.set(cv2.CAP_PROP_POS_MSEC, start_frame*1000)
+    vid.set(cv2.CAP_PROP_FPS, fps)
+    while True:
+        success, image = vid.read()
+        if not success:
+            break
+        frames.append(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+        if vid.get(cv2.CAP_PROP_POS_MSEC)>duration_seconds*1000:
+            break
+    vid.release()
+    cv2.imwrite(path_to_gif, frames)
