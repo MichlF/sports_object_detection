@@ -1,5 +1,6 @@
 import functools
 from time import perf_counter
+from typing import Any, Callable
 
 
 def timer(enabled: bool = True, decimal_places: int = 4):
@@ -15,9 +16,9 @@ def timer(enabled: bool = True, decimal_places: int = 4):
     A decorated function that prints the execution time if the timer is enabled.
     """
 
-    def decorator(function):
+    def decorator(function: Callable[..., Any]) -> Callable[..., Any]:
         @functools.wraps(function)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args: Any, **kwargs: Any) -> Any:
             if enabled:
                 before = perf_counter()
                 value = function(*args, **kwargs)
