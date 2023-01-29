@@ -65,7 +65,7 @@ python main.py
 
 ## How It Works
 
-EMPTY
+You can find a detailed explanation of how it works in the [wiki](https://github.com/MichlF/sports_object_detection/wiki).
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -75,14 +75,14 @@ EMPTY
 The following features are in the making ([contributions welcome !](#contributing)) and limitations apply.
 ### Features to add  
 
-- [ ] Provide an extensive explanation on how it works
-- [ ] Implement saving the ball trajectory and player path to .csv
+- [X] Provide an extensive explanation on how it works
+- [X] Implement saving the ball trajectory and player path to .csv
 - [ ] Provide additional metrics
+  - [ ] Provide a counter for the number of strokes
   - [ ] Provide a counter for the number of ball bounces
   - [ ] Calculate speed for each ball stroke
-  - [ ] Provide a counter for the number of strokes
 - [ ] Allow passing arguments from CLI that override config arguments
-- [ ] Instead of using TrackNet, create a custom dataset and train YOLO to detect the tennis ball reliably. This is likely to massively increase performance as TrackNet accounts for almost 80% of the total processing time.
+- [ ] Instead of using TrackNet, either implement TrackNetV2 or create a custom dataset and train YOLO to detect the tennis ball reliably. This is likely to massively increase performance as TrackNet accounts for almost 80% of the total processing time.
 - [ ] Add transformations for video footage with a moving camera (perspective)
 - [ ] Improve player vs. non-player detection 
 - [ ] Provide code adaptations to fully support other sports
@@ -113,9 +113,9 @@ Don't forget to give the project a star! Thanks again!
 
 ## Acknowledgements  
 - YOLOv8 from [Ultralytics](https://github.com/ultralytics/ultralytics)
-- Huang, Y. C., Liao, I. N., Chen, C. H., İk, T. U., & Peng, W. C. (2019, September). TrackNet: A deep learning network for tracking high-speed and tiny objects in sports applications. In 2019 16th IEEE International Conference on Advanced Video and Signal Based Surveillance (AVSS) (pp. 1-8). IEEE. Find the repository [here](https://nol.cs.nctu.edu.tw:234/open-source/TrackNet)  
-- Maxime Bataille's version (find it [here](https://github.com/MaximeBataille/tennis_tracking))
-- levan92's [DeepSort](https://github.com/levan92/deep_sort_realtime) in realtime  
+- levan92's [DeepSort in realtime](https://github.com/levan92/deep_sort_realtime) algorithm implementation adapted from Wojke, N., Bewley, A., & Paulus, D. (2017, September). Simple online and realtime tracking with a deep association metric. In 2017 IEEE international conference on image processing (ICIP) (pp. 3645-3649). IEEE. The code can be found [here](https://github.com/levan92/deep_sort_realtime).
+- TrackNet II as described in Huang, Y. C., Liao, I. N., Chen, C. H., İk, T. U., & Peng, W. C. (2019, September). TrackNet: A deep learning network for tracking high-speed and tiny objects in sports applications. In 2019 16th IEEE International Conference on Advanced Video and Signal Based Surveillance (AVSS) (pp. 1-8). IEEE. The code can be found [here](https://nol.cs.nctu.edu.tw:234/open-source/TrackNet).
+- Maxime Bataille's repo (find it [here](https://github.com/MaximeBataille/tennis_tracking))
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
