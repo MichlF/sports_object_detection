@@ -1,9 +1,7 @@
 from collections import deque
 import numpy as np
 import matplotlib
-import pandas as pd
 import cv2
-import time
 from tqdm import tqdm
 from ultralytics import YOLO
 from models.TrackNet.track_net import track_net
@@ -12,7 +10,6 @@ from submodules.ball import (
     draw_ball,
     draw_ball_2d,
     get_ball_position_tracknet,
-    bounce_analysis,
     store_data,
 )
 from submodules.config import *
@@ -41,7 +38,7 @@ from utilities.gpu import init_gpu_tpu
 matplotlib.use("TkAgg", force=True)
 print("Switched to:", matplotlib.get_backend())
 
-# Activate GPU support
+# Activate GPU support (necessary for some TF versions)
 init_gpu_tpu()
 
 
@@ -66,7 +63,7 @@ def process_video():
 
     # Define output video parameters
     vid_out = cv2.VideoWriter(
-        str(PATH_OUT_VIDEO / VIDEO_IN_NAME),
+        str(PATH_OUT_VIDEO / ("processed_" + VIDEO_IN_NAME)),
         cv2.VideoWriter_fourcc(*VIDEO_OUT_CODEC),
         VIDEO_OUT_FPS,
         vid_in_resolution_wh,
@@ -95,7 +92,7 @@ def process_video():
         ball_trajectory.appendleft(None)
     pp_tracking = PlayerPathTracker(maxlen=OBJECT_TRACKER_LEN)
     tracker = DeepSort(
-        max_age=DEEPSORT_MAX_AGE,  # int(fps / (fps / 5)),
+        max_age=DEEPSORT_MAX_AGE,
         n_init=DEEPSORT_N_INIT,
         nms_max_overlap=DEEPSORT_NMS_MAX_OVERLAP,
         max_cosine_distance=DEEPSORT_COSINE_DISTANCE,
@@ -108,7 +105,6 @@ def process_video():
     )
 
     # Instantiate list objects
-    frames_list, ball_list = [], []
 
     # Start processing the video
     for frame_count in tqdm(range(vid_in_total_frames)):
@@ -120,7 +116,6 @@ def process_video():
         # 1. Return video frame-by-frame and create copy to draw on it
         vid_in.set(1, frame_count)
         success, frame_in = vid_in.read()
-        # cv2.imwrite(str(PATH_OUT_FRAME / f"frame_{frame_count}.jpg"), frame_in)
         frame_out = frame_in.copy()
         if not success:
             raise ValueError(f"Couldn't load frame {frame_count} !")
@@ -164,6 +159,12 @@ def process_video():
             player_xywh=player_boxes_wh[idx_to_keep],
             player_confs=player_confs[idx_to_keep],
         )
+        # A hack for now: remove player IDs above 2 because they are not players
+        player_ids = [player_id for player_id in player_ids if int(player_id) < 3]
+        player_boxes = [player_id for i, player_id in zip(player_ids, player_boxes) if int(i) < 3]
+        player_centergrounds = [
+            player_id for i, player_id in zip(player_ids, player_centergrounds) if int(i) < 3
+        ]
         pp_tracking.update_path(
             frame_no=frame_count, player_positions=player_centergrounds, player_ids=player_ids
         )
@@ -174,7 +175,6 @@ def process_video():
         ).astype(np.float32)
         # TrackNet cannot predict the ball location on the first two frames
         ball = None
-        # start = time.time()
         if frame_count > 1:
             last_three_images = np.concatenate((frame_in_n_2, frame_in_n_1, frame_in), axis=2)
             ball = get_ball_position_tracknet(
@@ -182,7 +182,6 @@ def process_video():
                 tracknet_object=model_tracknet,
                 output_res=vid_in_resolution_wh,
             )
-        # print("Time elapsed:", 1000*(time.time()-start))
 
         # 4. Draw objects onto the frame
         frame_out = draw_court_lines(
@@ -212,7 +211,7 @@ def process_video():
             image=frame_out,
             xy=ball,
             trajectory_deque=ball_trajectory,
-            annotation_type="both",  # "location" for x,y "direction" for vectors or "both"
+            annotation_type="location",  # "location" for x,y "direction" for vectors or "both"
             color=COLOR_BALL,
             radius=RADIUS_BALL,
             thickness=THICKNESS_BALL,
@@ -256,7 +255,6 @@ def process_video():
             image=frame_out, image_minimap=frame_out_2d, border_color=COLOR_BORDER_2D
         )
 
-        #! TRYOUTING
         if frame_count != 0 and frame_count % OBJECT_TRACKER_LEN == 0:
             # Every OBJECT_TRACKER_LEN we expand the dataframes for ball and player locations
             player_paths_to_store = pp_tracking.retrieve_batch(
@@ -265,21 +263,8 @@ def process_video():
             pp_tracking.to_dataframe(data=player_paths_to_store)
             ball_list.extend(list(ball_trajectory))
 
-        # # Estimate a bounce every ball_trajectory_len - half the window size frames
-        # window_size = 7
-        # # if frame_count % len(ball_trajectory)-int(window_size/2):
-        # #     bounce_analysis(ball_trajectory, window_size, frame_count)
-        # frames_list.append(
-        #     bounce_analysis(
-        #         trajectory_deque=ball_trajectory,
-        #         window_size=window_size,
-        #         frame_count_debug=frame_count,
-        #         image_debug=frame_out,
-        #     )
-        # )
         # 5. Write the frame to the output video
         vid_out.write(frames_combined)
-        # print("Frames_list: ", frames_list)
 
     # Last frame processed: release videocaptures and store statistics
     vid_in.release()
