@@ -24,6 +24,7 @@
   <a href="#how-to-use">How To Use</a> •
   <a href="#how-it-works">How It Works</a> •
   <a href="#roadmap">Roadmap</a> •
+  <a href="#contributing">Contributing</a> •
   <a href="#acknowledgements">Acknowledgements</a>
 </p>
 
@@ -45,7 +46,7 @@
 
 ## How To Use
 
-For this app to work you need to either clone or [Git](https://git-scm.com) install this repo on your computer. Make sure to install the requirements along with it. You can do this by running the following command in your command line:
+For this app to work you need to either clone or [Git](https://git-scm.com) install this repo onto your computer. Make sure to install the requirements along with it. You can do this by running the following command in your command line:
 
 ```bash
 # Pip install with requirements
@@ -69,7 +70,6 @@ You can find a detailed explanation of how it works in the [wiki](https://github
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-<!-- ROADMAP -->
 ## Roadmap  
 
 The following features are in the making ([contributions welcome !](#contributing)) and limitations apply.

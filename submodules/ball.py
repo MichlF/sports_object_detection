@@ -48,10 +48,10 @@ def get_ball_position_tracknet(
             minRadius=2,
             maxRadius=7,
         )[0][0][:2]
-    except:
+    except Exception as e:
         print(
             " TrackNet couldn't detect the tennis ball. This is expected behavior when the ball is"
-            " not in frame."
+            " not in frame.", e
         )
         circles = None
     return circles
@@ -134,7 +134,7 @@ def draw_ball(
                     *args,
                     **kwargs,
                 )
-    else:
+    if annotation_type not in ["both", "direction", "location"]:
         raise KeyError(f" {annotation_type} is an unknown annotation type for drawing the ball.")
     return image, trajectory_deque
 
@@ -161,6 +161,7 @@ def draw_ball_2d(
                 np.uint32
             )
             cv2.circle(img=image, center=ball_center, *args, **kwargs)
+            cv2.circle(img=image, center=ball_center, color=(0,0,0), radius=1, thickness=-1)
         except Exception as e:
             print(
                 " 2D transformation for ball failed. This is expected behavior when the ball is"

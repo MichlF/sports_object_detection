@@ -247,6 +247,13 @@ class PlayerPathTracker:
                             *args,
                             **kwargs,
                         )
+                        cv2.circle(
+                            image,
+                            tuple(position[1:][0]),
+                            radius=int(radius/2),
+                            color=(0,0,0),
+                            thickness=thickness,
+                        )
                     except Exception as e:
                         print(" Couldn't draw path, see x,y: ", tuple(position), e)
         return image
@@ -273,6 +280,9 @@ class PlayerPathTracker:
                     try:
                         cv2.circle(
                             image, tuple(ball_center), radius, color, thickness, *args, **kwargs
+                        )
+                        cv2.circle(
+                            image, tuple(ball_center), int(radius/2), (0,0,0), thickness, *args, **kwargs
                         )
                     except Exception as e:
                         print(" Couldn't draw 2D path, see x,y: ", tuple(ball_center), e)

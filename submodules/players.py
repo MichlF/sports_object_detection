@@ -124,6 +124,7 @@ def draw_players_2d(
         )
         try:
             cv2.circle(img=image, center=np.squeeze(center).astype(np.uint32), *args, **kwargs)
+            cv2.circle(img=image, center=np.squeeze(center).astype(np.uint32), radius=3, color=(0,0,0), thickness=-1)
         except:
             print(
                 " Could not 2D draw a player, see xy: ",

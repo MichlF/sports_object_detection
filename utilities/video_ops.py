@@ -3,6 +3,7 @@ import cv2
 from pathlib import Path
 from moviepy.editor import VideoFileClip
 from tqdm import tqdm
+import imageio
 
 
 def read_video(
@@ -115,14 +116,17 @@ def resize_opencv(
 def mp4_to_gif_opencv(path_to_mp4, path_to_gif, start_frame, duration_seconds, fps):
     vid = cv2.VideoCapture(path_to_mp4)
     frames = []
-    vid.set(cv2.CAP_PROP_POS_MSEC, start_frame*1000)
+    vid.set(cv2.CAP_PROP_POS_MSEC, start_frame * 1000)
     vid.set(cv2.CAP_PROP_FPS, fps)
+    print("Starting to write animated gif...")
     while True:
         success, image = vid.read()
         if not success:
             break
         frames.append(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
-        if vid.get(cv2.CAP_PROP_POS_MSEC)>duration_seconds*1000:
+        if vid.get(cv2.CAP_PROP_POS_MSEC) > duration_seconds * 1000:
+            print(vid.get(cv2.CAP_PROP_POS_MSEC))
             break
     vid.release()
-    cv2.imwrite(path_to_gif, frames)
+    imageio.mimsave(path_to_gif, frames, fps=fps)
+    print("Animated gif successfully written.")
