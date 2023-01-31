@@ -34,7 +34,7 @@
 </p>
 
 <h4 align="center">
-<img src="https://raw.githubusercontent.com/MichlF/sports_object_detection/raw/main/images/demo.gif" title="Demo" alt="Demo" width="400"></a>
+<img src="https://raw.githubusercontent.com/MichlF/sports_object_detection/main/images/demo.gif" title="Demo" alt="Demo" width="400"></a>
 </h4>
 
 ## Key Features
