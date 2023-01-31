@@ -2,7 +2,7 @@
 
 <h1 align="center">
   <br>
-  <img src="https://github.com/MichlF/sports_object_detection/raw/main/images/tennis.png" title="Image taken from Flaticon: Those Icons" alt="From Flaticon Those Icons" width="75"></a>
+  <img src="https://github.com/MichlF/sports_object_detection/raw/main/images/tennis.png" title="Image taken from Flaticon: Those Icons" alt="From Flaticon Those Icons" width="75">
   <br>
   Object Detection in Sports
   <br>
@@ -33,7 +33,9 @@
     <a href="https://github.com/MichlF/sports_object_detection/issues">Request Feature</a>
 </p>
 
-![screenshot](https://raw.githubusercontent.com/MichlF/sports_object_detection/raw/main/images/demo.gif)
+<h4 align="center">
+<img src="https://raw.githubusercontent.com/MichlF/sports_object_detection/raw/main/images/demo.gif" title="Demo" alt="Demo" width="400"></a>
+</h4>
 
 ## Key Features
 
@@ -85,7 +87,6 @@ The following features are in the making ([contributions welcome !](#contributin
 - [ ] Instead of using TrackNet, either implement TrackNetV2 or create a custom dataset and train YOLO to detect the tennis ball reliably. This is likely to massively increase performance as TrackNet accounts for almost 80% of the total processing time.
 - [ ] Add transformations for video footage with a moving camera (perspective)
 - [ ] Improve player vs. non-player detection 
-- [ ] Provide code adaptations to fully support other sports
 
 ### Limitations  
 
