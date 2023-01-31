@@ -92,7 +92,7 @@ def draw_ball(
         arrow_length = 25
         # Correct thickness values below 0 because arrowedLine does not accept them.
         if kwargs["thickness"] is not None and kwargs["thickness"] <= 0:
-            kwargs["thickness"] = 3
+            kwargs["thickness"] = 2
         # When direction and ball position are plotted, reduce arrow thickness to prevent
         # occlusion of the ball by the arrow. Also, remove radius from kwargs
         if annotation_type == "both":
