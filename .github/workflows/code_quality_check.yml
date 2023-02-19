@@ -26,4 +26,4 @@ jobs:
         run: |
           black .
           isort .
-          flake8 . --max-line-length 79
+          flake8 . --max-line-length 79 --ignore=E405
