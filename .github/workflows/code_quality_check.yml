@@ -24,6 +24,6 @@ jobs:
           pip install isort black black[jupyter] flake8
       - name: Check quality
         run: |
-          black .
+          black . --line-length 79
           isort .
           flake8 . --max-line-length 79 --ignore=F405,F403
