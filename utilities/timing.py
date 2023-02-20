@@ -25,7 +25,10 @@ def timer(enabled: bool = True, decimal_places: int = 4):
                 after = perf_counter()
                 time_diff = after - before
                 formatted_time = f"{time_diff:.{decimal_places}f}"
-                print(f"Function {function.__name__} took {formatted_time} secs to run.")
+                print(
+                    f"Function {function.__name__} took {formatted_time} secs"
+                    " to run."
+                )
             else:
                 value = function(*args, **kwargs)
             return value

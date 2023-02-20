@@ -68,15 +68,9 @@ MINIMAP_SCALING = 3.5
 
 # Define paths
 PATH_IN_VIDEO = Path("input")
-PATH_OUT_VIDEO = Path(
-    "output\\videos"
-)
-PATH_OUT_FRAME = Path(
-    "output\\frames"
-)
-PATH_OUT_STATS = Path(
-    "output\\statistics"
-)
+PATH_OUT_VIDEO = Path("output\\videos")
+PATH_OUT_FRAME = Path("output\\frames")
+PATH_OUT_STATS = Path("output\\statistics")
 
 # Create folder structures
 PATH_OUT_VIDEO.mkdir(parents=True, exist_ok=True)

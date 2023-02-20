@@ -1,9 +1,10 @@
 """Module containing functions to read a video"""
-import cv2
 from pathlib import Path
+
+import cv2
+import imageio
 from moviepy.editor import VideoFileClip
 from tqdm import tqdm
-import imageio
 
 
 def read_video(
@@ -39,13 +40,17 @@ def read_video(
         if show_frames:
             cv2.imshow("Frame", frame)
         if save_frame:
-            cv2.imwrite(f"output_frames/frame{frame_count}.jpg", frame, *args, **kwargs)
+            cv2.imwrite(
+                f"output_frames/frame{frame_count}.jpg", frame, *args, **kwargs
+            )
             frame_count += 1
         # Exit the loop if the user presses the 'q' key
         if cv2.waitKey(0) & 0xFF == ord("q"):
             cv2.destroyAllWindows()
             raise KeyError("You have stopped the simulation!")
-        elif frame_by_frame and cv2.waitKey(0) & 0xFF == ord(" "):  # frame by frame with other key
+        elif frame_by_frame and cv2.waitKey(0) & 0xFF == ord(
+            " "
+        ):  # frame by frame with other key
             continue
     # Release the video capture object and close all windows
     video.release()
@@ -71,7 +76,9 @@ def resize_moviepy(
         **kwargs: Additional keyword arguments to be passed to `video.resize`
     """
     video = VideoFileClip(input_path)
-    resized_video = video.resize(height=resolution_height, width=resolution_width, *args, **kwargs)
+    resized_video = video.resize(
+        height=resolution_height, width=resolution_width, *args, **kwargs
+    )
     resized_video.write_videofile(output_path)
 
 
@@ -97,7 +104,9 @@ def resize_opencv(
     # Get the frames per second (fps) and codec info from the video
     fps = int(cap.get(cv2.CAP_PROP_FPS))
     fourcc = int(cap.get(cv2.CAP_PROP_FOURCC))
-    out = cv2.VideoWriter(output_path, fourcc, fps, (resolution_height, resolution_width))
+    out = cv2.VideoWriter(
+        output_path, fourcc, fps, (resolution_height, resolution_width)
+    )
     # Start the loop with a progress bar
     frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     for _ in tqdm(range(frame_count)):
@@ -107,13 +116,18 @@ def resize_opencv(
             print("Couln't read the video.")
             break
         # Resize the frame to 640x640 pixels and write to output
-        frame = cv2.resize(frame, (resolution_height, resolution_width), *args, **kwargs)
+        frame = cv2.resize(
+            frame, (resolution_height, resolution_width), *args, **kwargs
+        )
         out.write(frame)
     # Release the video capture and output objects
     cap.release()
     out.release()
 
-def mp4_to_gif_opencv(path_to_mp4, path_to_gif, start_frame, duration_seconds, fps):
+
+def mp4_to_gif_opencv(
+    path_to_mp4, path_to_gif, start_frame, duration_seconds, fps
+):
     vid = cv2.VideoCapture(path_to_mp4)
     frames = []
     vid.set(cv2.CAP_PROP_POS_MSEC, start_frame * 1000)

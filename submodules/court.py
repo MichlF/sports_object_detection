@@ -1,19 +1,24 @@
 import cv2
 import numpy as np
+
 from utilities.timing import timer
+
+from .config import TIME_FUNCTIONS
 from .find_corners import (
     canny_method,
-    houghlines_method,
     find_contours_harris,
     find_corner_pts,
     get_corners_pts,
+    houghlines_method,
 )
-from .config import TIME_FUNCTIONS
 
 
 @timer(enabled=TIME_FUNCTIONS)
 def create_avg_frame(
-    video_capture_object, start_frame: int = 0, end_frame: int = 100, n_th_frame: int = 10
+    video_capture_object,
+    start_frame: int = 0,
+    end_frame: int = 100,
+    n_th_frame: int = 10,
 ) -> np.ndarray:
     frames = []
     for frame_no in range(start_frame, end_frame, n_th_frame):
@@ -36,7 +41,13 @@ def draw_minimap_to_frame(
     images_combined = image.copy()  # deepcopy(image)
     frame_out_2d_bordered = image_minimap.copy()  # deepcopy(image_minimap)
     frame_out_2d_bordered = cv2.copyMakeBorder(
-        frame_out_2d_bordered, 5, 5, 5, 5, cv2.BORDER_CONSTANT, value=border_color
+        frame_out_2d_bordered,
+        5,
+        5,
+        5,
+        5,
+        cv2.BORDER_CONSTANT,
+        value=border_color,
     )
     # Get the shape of minimap, define the region of interest on image and blend minimap with it
     rows, cols, _ = frame_out_2d_bordered.shape
@@ -117,10 +128,18 @@ def get_court_corners_2d(height: int = 1000, pad: float = 0.22):
 
 @timer(enabled=TIME_FUNCTIONS)
 def draw_court_lines(
-    image: np.ndarray, court_corners: tuple[tuple, tuple, tuple, tuple], *args, **kwargs
+    image: np.ndarray,
+    court_corners: tuple[tuple, tuple, tuple, tuple],
+    *args,
+    **kwargs,
 ) -> np.ndarray:
     """DOC"""
-    corner_coords_1, corner_coords_2, corner_coords_3, corner_coords_4 = court_corners
+    (
+        corner_coords_1,
+        corner_coords_2,
+        corner_coords_3,
+        corner_coords_4,
+    ) = court_corners
     cv2.line(image, corner_coords_1, corner_coords_2, *args, **kwargs)
     cv2.line(image, corner_coords_2, corner_coords_3, *args, **kwargs)
     cv2.line(image, corner_coords_3, corner_coords_4, *args, **kwargs)
@@ -130,7 +149,10 @@ def draw_court_lines(
 
 @timer(enabled=TIME_FUNCTIONS)
 def draw_court_corners_2d(
-    image: np.ndarray, court_corners: tuple[tuple, tuple, tuple, tuple], *args, **kwargs
+    image: np.ndarray,
+    court_corners: tuple[tuple, tuple, tuple, tuple],
+    *args,
+    **kwargs,
 ):
     for cc in court_corners:
         cv2.circle(img=image, center=cc, *args, **kwargs)
@@ -199,8 +221,12 @@ def detect_corners_auto(
     image, contours, _ = find_contours_harris(
         image=houghlines, show_intermediate_steps=show_intermediate_steps
     )
-    image, corner_points = find_corner_pts(contour_object=contours, output_res=np.shape(image))
-    image, corner_list = get_corners_pts(corner_pts=corner_points, output_res=np.shape(image))
+    image, corner_points = find_corner_pts(
+        contour_object=contours, output_res=np.shape(image)
+    )
+    image, corner_list = get_corners_pts(
+        corner_pts=corner_points, output_res=np.shape(image)
+    )
     if show_intermediate_steps:
         cv2.imshow("image_in", image)
         cv2.imshow("canny_dilated", canny_dilated)
@@ -242,7 +268,9 @@ def return_xy_for_mouseclick(image):
             break
         if cv2.waitKey(1) & 0xFF == ord("q"):  # allow to quit with Q
             break
-        if cv2.waitKey(1) & 0xFF == 8:  # if user presses backspace, he can redo the last click
+        if (
+            cv2.waitKey(1) & 0xFF == 8
+        ):  # if user presses backspace, he can redo the last click
             if clicks:
                 clicks.pop()
                 # Clear the last circle
@@ -250,8 +278,20 @@ def return_xy_for_mouseclick(image):
                 for coords in clicks:
                     x, y = coords
                     plus_size = 10
-                    cv2.line(image, (x - plus_size, y), (x + plus_size, y), (0, 0, 255), 2)
-                    cv2.line(image, (x, y - plus_size), (x, y + plus_size), (0, 0, 255), 2)
+                    cv2.line(
+                        image,
+                        (x - plus_size, y),
+                        (x + plus_size, y),
+                        (0, 0, 255),
+                        2,
+                    )
+                    cv2.line(
+                        image,
+                        (x, y - plus_size),
+                        (x, y + plus_size),
+                        (0, 0, 255),
+                        2,
+                    )
                 cv2.imshow("image", image)
     cv2.destroyAllWindows()
     return clicks[:4]

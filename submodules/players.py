@@ -1,13 +1,19 @@
 import cv2
 import numpy as np
+
 from utilities.timing import timer
 from utilities.trajectory_ops import distance_to_vertical_centerline
+
 from .config import TIME_FUNCTIONS
 
 
 @timer(enabled=TIME_FUNCTIONS)
 def get_player_boxes_yolo(
-    image: np.ndarray, model_yolo_object, yolo_conf: float, apply_nms=False, nms_thresh=0.3
+    image: np.ndarray,
+    model_yolo_object,
+    yolo_conf: float,
+    apply_nms=False,
+    nms_thresh=0.3,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     model_yolo_results = model_yolo_object(
         source=image, conf=yolo_conf, verbose=False
@@ -15,21 +21,34 @@ def get_player_boxes_yolo(
     # Results is a generator containing a result class for each analyzed image/frame
     # Each result class contains a box for each detected object in boxes
     # Each box has a value for the xyxy / xywh coordinates, confidence scores (conf) and class id (cls).
-    player_boxes, player_confs, player_centroids, player_centergrounds = [], [], [], []
-    for results_frame in model_yolo_results:  # assumes only a single frame is analyzed
+    player_boxes, player_confs, player_centroids, player_centergrounds = (
+        [],
+        [],
+        [],
+        [],
+    )
+    for (
+        results_frame
+    ) in model_yolo_results:  # assumes only a single frame is analyzed
         # Remove any non-person objects
         person_selector = results_frame.boxes.cls == 0  # 0 is Person
-        player_confs = np.array(results_frame.boxes.conf[person_selector].cpu())
-        player_boxes = np.array(results_frame.boxes.xyxy[person_selector].cpu()).astype(np.uint32)
-        player_boxes_wh = np.array(results_frame.boxes.xywh[person_selector].cpu()).astype(
-            np.uint32
+        player_confs = np.array(
+            results_frame.boxes.conf[person_selector].cpu()
         )
-        player_centroids = np.array(results_frame.boxes.xywh[person_selector][:, :2].cpu()).astype(
-            np.uint32
-        )
+        player_boxes = np.array(
+            results_frame.boxes.xyxy[person_selector].cpu()
+        ).astype(np.uint32)
+        player_boxes_wh = np.array(
+            results_frame.boxes.xywh[person_selector].cpu()
+        ).astype(np.uint32)
+        player_centroids = np.array(
+            results_frame.boxes.xywh[person_selector][:, :2].cpu()
+        ).astype(np.uint32)
         for _, rectangle in enumerate(player_boxes):
             # Get bottom point (half the width of bottom boundary box line)
-            player_centergrounds.append(((rectangle[0] + rectangle[2]) / 2, rectangle[3]))
+            player_centergrounds.append(
+                ((rectangle[0] + rectangle[2]) / 2, rectangle[3])
+            )
         # YOLO's xywh method returns boundary boxes relative to the centroid,
         # but we actually want it relative to top-left point for DeepSort.
         for idx, _ in enumerate(player_boxes_wh):
@@ -39,16 +58,26 @@ def get_player_boxes_yolo(
     # Note: Since we previously already selected on only class person, we don't need to be worried about
     # overlaps between boxes of different classes.
     if apply_nms:
-        keep = non_max_suppression(boxes=player_boxes, confs=player_confs, threshold=nms_thresh)
+        keep = non_max_suppression(
+            boxes=player_boxes, confs=player_confs, threshold=nms_thresh
+        )
         player_boxes = player_boxes[keep]
         player_boxes_wh = player_boxes_wh[keep]
         player_confs = player_confs[keep]
         player_centroids = player_centroids[keep]
         player_centergrounds = player_centergrounds[keep]
-    return (player_boxes, player_boxes_wh, player_confs, player_centroids, player_centergrounds)
+    return (
+        player_boxes,
+        player_boxes_wh,
+        player_confs,
+        player_centroids,
+        player_centergrounds,
+    )
 
 
-def non_max_suppression(boxes: np.ndarray, confs: np.ndarray, threshold: np.ndarray):
+def non_max_suppression(
+    boxes: np.ndarray, confs: np.ndarray, threshold: np.ndarray
+):
     """
     Perform Non-Maximum Suppression (NMS) on bounding boxes.
 
@@ -84,7 +113,10 @@ def non_max_suppression(boxes: np.ndarray, confs: np.ndarray, threshold: np.ndar
 
 @timer(enabled=TIME_FUNCTIONS)
 def track_player_deep_sort(
-    image: np.ndarray, tracker_object, player_xywh: np.ndarray, player_confs: np.ndarray
+    image: np.ndarray,
+    tracker_object,
+    player_xywh: np.ndarray,
+    player_confs: np.ndarray,
 ) -> tuple[list[str], list[np.ndarray], list[np.ndarray]]:
     bb_update, track_id, bboxes, centergrounds = [], [], [], []
     for idx, bb_player in enumerate(player_xywh):
@@ -96,7 +128,9 @@ def track_player_deep_sort(
         if not track.is_confirmed():
             continue
         bbox = track.to_ltrb(orig=True, orig_strict=False).astype(np.uint32)
-        centerground = np.array([np.mean([bbox[0], bbox[2]]), bbox[3]]).astype(np.uint32)
+        centerground = np.array([np.mean([bbox[0], bbox[2]]), bbox[3]]).astype(
+            np.uint32
+        )
         track_id.append(track.track_id)
         bboxes.append(bbox)
         centergrounds.append(centerground)
@@ -104,7 +138,9 @@ def track_player_deep_sort(
 
 
 @timer(enabled=TIME_FUNCTIONS)
-def draw_players(image: np.ndarray, xyxy: np.ndarray, *args, **kwargs) -> np.ndarray:
+def draw_players(
+    image: np.ndarray, xyxy: np.ndarray, *args, **kwargs
+) -> np.ndarray:
     """Draws colored boundary box for each given player onto an image,
     adds player ids and classification confidence"""
     for box_coords in xyxy:
@@ -115,7 +151,11 @@ def draw_players(image: np.ndarray, xyxy: np.ndarray, *args, **kwargs) -> np.nda
 
 @timer(enabled=TIME_FUNCTIONS)
 def draw_players_2d(
-    image: np.ndarray, homography_mat: np.ndarray, player_locations: np.ndarray, *args, **kwargs
+    image: np.ndarray,
+    homography_mat: np.ndarray,
+    player_locations: np.ndarray,
+    *args,
+    **kwargs,
 ) -> np.ndarray:
     """doc"""
     for player in player_locations:
@@ -123,8 +163,19 @@ def draw_players_2d(
             player.reshape(-1, 1, 2).astype(np.float32), homography_mat
         )
         try:
-            cv2.circle(img=image, center=np.squeeze(center).astype(np.uint32), *args, **kwargs)
-            cv2.circle(img=image, center=np.squeeze(center).astype(np.uint32), radius=3, color=(0,0,0), thickness=-1)
+            cv2.circle(
+                img=image,
+                center=np.squeeze(center).astype(np.uint32),
+                *args,
+                **kwargs,
+            )
+            cv2.circle(
+                img=image,
+                center=np.squeeze(center).astype(np.uint32),
+                radius=3,
+                color=(0, 0, 0),
+                thickness=-1,
+            )
         except:
             print(
                 " Could not 2D draw a player, see xy: ",
@@ -166,12 +217,20 @@ def draw_players_ID(
 
 
 def extract_players_close_to_baseline(
-    image: np.ndarray, bboxes: np.ndarray, show_result: bool = False, *args, **kwargs
+    image: np.ndarray,
+    bboxes: np.ndarray,
+    show_result: bool = False,
+    *args,
+    **kwargs,
 ) -> np.ndarray:
     players_to_keep = []
     for _, player_xy in enumerate(bboxes):
         players_to_keep.append(
-            np.abs(distance_to_vertical_centerline(pt=player_xy, resolution_wh=image.shape[:2]))
+            np.abs(
+                distance_to_vertical_centerline(
+                    pt=player_xy, resolution_wh=image.shape[:2]
+                )
+            )
         )
     # Pick the two shortest distances and plot results if flagged
     keep = np.argsort(players_to_keep)[:2]
@@ -190,7 +249,9 @@ def extract_players_close_to_baseline(
         cv2.line(
             img=results_image,
             pt1=np.array([image.shape[:2][1] / 2, 0]).astype(np.uint32),
-            pt2=np.array([image.shape[:2][1] / 2, image.shape[:2][0]]).astype(np.uint32),
+            pt2=np.array([image.shape[:2][1] / 2, image.shape[:2][0]]).astype(
+                np.uint32
+            ),
             color=(255, 255, 255),
             thickness=10,
         )

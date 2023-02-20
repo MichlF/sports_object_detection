@@ -1,17 +1,23 @@
 import math
-from itertools import islice
-import pandas as pd
-import numpy as np
-import cv2
 from collections import deque
-from utilities.trajectory_ops import detect_direction_angle
+from itertools import islice
+
+import cv2
+import numpy as np
+import pandas as pd
+
 from utilities.timing import timer
+from utilities.trajectory_ops import detect_direction_angle
+
 from .config import MODEL_RESOLUTION, TIME_FUNCTIONS
 
 
 @timer(enabled=TIME_FUNCTIONS)
 def get_ball_position_tracknet(
-    images: np.ndarray, tracknet_object, output_res: tuple[int, int], n_classes: int = 256
+    images: np.ndarray,
+    tracknet_object,
+    output_res: tuple[int, int],
+    n_classes: int = 256,
 ) -> np.ndarray:
     """
     Use the TrackNet model to predict the position of the ball in the given images.
@@ -26,17 +32,23 @@ def get_ball_position_tracknet(
         representing the ball position in the images.
     """
     images = np.rollaxis(a=images, axis=2, start=0)
-    model_tracknet_pred = tracknet_object.predict(np.array([images]), verbose=0)[0]
+    model_tracknet_pred = tracknet_object.predict(
+        np.array([images]), verbose=0
+    )[0]
     # Tracknet returns (net_output_height, model_output_width, n_classes)
     # Thus, reshape image to (net_output_height, model_output_width, n_classes(depth))
     model_tracknet_pred = model_tracknet_pred.reshape(
         (MODEL_RESOLUTION[0], MODEL_RESOLUTION[1], n_classes)
     ).argmax(axis=2)
     # Reshape to original image resolution (as uint8, necessary for cv2) to get ball heatmap
-    heatmap = cv2.resize(src=model_tracknet_pred.astype(np.uint8), dsize=output_res)
+    heatmap = cv2.resize(
+        src=model_tracknet_pred.astype(np.uint8), dsize=output_res
+    )
     # Turn gaussian blob/s into binary circular object and find ball/s in heatmap with 2<=radius<=7
     # Return only the first circle without radius
-    _, heatmap = cv2.threshold(src=heatmap, thresh=127, maxval=255, type=cv2.THRESH_BINARY)
+    _, heatmap = cv2.threshold(
+        src=heatmap, thresh=127, maxval=255, type=cv2.THRESH_BINARY
+    )
     try:
         circles = cv2.HoughCircles(
             image=heatmap,
@@ -50,8 +62,9 @@ def get_ball_position_tracknet(
         )[0][0][:2]
     except Exception as e:
         print(
-            " TrackNet couldn't detect the tennis ball. This is expected behavior when the ball is"
-            " not in frame.", e
+            " TrackNet couldn't detect the tennis ball. This is expected"
+            " behavior when the ball is not in frame.",
+            e,
         )
         circles = None
     return circles
@@ -82,12 +95,19 @@ def draw_ball(
             for ball in islice(trajectory_deque, draw_len_trajectory):
                 if ball is not None:
                     try:
-                        cv2.circle(img=image, center=ball.astype(np.uint32), *args, **kwargs)
+                        cv2.circle(
+                            img=image,
+                            center=ball.astype(np.uint32),
+                            *args,
+                            **kwargs,
+                        )
                     except Exception as e:
                         print(" Couldn't draw ball, see x,y: ", ball, e)
     if annotation_type == "direction" or annotation_type == "both":
         direction_list = detect_direction_angle(
-            positions_vector=list(islice(trajectory_deque, draw_len_trajectory))
+            positions_vector=list(
+                islice(trajectory_deque, draw_len_trajectory)
+            )
         )
         arrow_length = 25
         # Correct thickness values below 0 because arrowedLine does not accept them.
@@ -101,21 +121,36 @@ def draw_ball(
         for idx in range(len(direction_list)):
             if not math.isnan(direction_list[idx]):
                 # Calculate end_point using the vector direction and arrow length
-                start_point = (int(trajectory_deque[idx][0]), int(trajectory_deque[idx][1]))
+                start_point = (
+                    int(trajectory_deque[idx][0]),
+                    int(trajectory_deque[idx][1]),
+                )
                 end_point = (
                     int(
                         trajectory_deque[idx][0]
-                        + arrow_length * math.cos(math.radians(direction_list[idx]))
+                        + arrow_length
+                        * math.cos(math.radians(direction_list[idx]))
                     ),
                     int(
                         trajectory_deque[idx][1]
-                        + arrow_length * math.sin(math.radians(direction_list[idx]))
+                        + arrow_length
+                        * math.sin(math.radians(direction_list[idx]))
                     ),
                 )
                 if (
-                    (-direction_threshold <= direction_list[idx] <= direction_threshold)
-                    or (180 - direction_threshold <= direction_list[idx] <= 180)
-                    or (-180 <= direction_list[idx] <= -180 + direction_threshold)
+                    (
+                        -direction_threshold
+                        <= direction_list[idx]
+                        <= direction_threshold
+                    )
+                    or (
+                        180 - direction_threshold <= direction_list[idx] <= 180
+                    )
+                    or (
+                        -180
+                        <= direction_list[idx]
+                        <= -180 + direction_threshold
+                    )
                 ):
                     color = (255, 255, 255)
                 elif direction_list[idx] > 0:
@@ -135,7 +170,10 @@ def draw_ball(
                     **kwargs,
                 )
     if annotation_type not in ["both", "direction", "location"]:
-        raise KeyError(f" {annotation_type} is an unknown annotation type for drawing the ball.")
+        raise KeyError(
+            f" {annotation_type} is an unknown annotation type for drawing the"
+            " ball."
+        )
     return image, trajectory_deque
 
 
@@ -157,15 +195,21 @@ def draw_ball_2d(
                 # Note: deque is fixed to one memory location. Thus, any change to it will
                 # be retained on the global scale.
                 ball_center[0][0][1] = ball_center[0][0][1] + adjust_height
-            ball_center = np.squeeze(cv2.perspectiveTransform(ball_center, homography_mat)).astype(
-                np.uint32
-            )
+            ball_center = np.squeeze(
+                cv2.perspectiveTransform(ball_center, homography_mat)
+            ).astype(np.uint32)
             cv2.circle(img=image, center=ball_center, *args, **kwargs)
-            cv2.circle(img=image, center=ball_center, color=(0,0,0), radius=1, thickness=-1)
+            cv2.circle(
+                img=image,
+                center=ball_center,
+                color=(0, 0, 0),
+                radius=1,
+                thickness=-1,
+            )
         except Exception as e:
             print(
-                " 2D transformation for ball failed. This is expected behavior when the ball is"
-                " not in frame.",
+                " 2D transformation for ball failed. This is expected behavior"
+                " when the ball is not in frame.",
                 e,
             )
     return image
@@ -173,7 +217,10 @@ def draw_ball_2d(
 
 @timer(enabled=TIME_FUNCTIONS)
 def bounce_analysis(
-    trajectory_deque: deque = None, window_size: int = 5, frame_count_debug=0, image_debug=None
+    trajectory_deque: deque = None,
+    window_size: int = 5,
+    frame_count_debug=0,
+    image_debug=None,
 ):
     direction_list = detect_direction_angle(positions_vector=trajectory_deque)
     bounces = detect_bounce_average_window(
@@ -204,7 +251,10 @@ def detect_bounce_average_window(
     :return : list of integers representing if there is a bounce at that index or not
     """
     if window_size > len(directions_vectors):
-        raise ValueError("Window size cannot be larger than the length of direction_vectors !")
+        raise ValueError(
+            "Window size cannot be larger than the length of"
+            " direction_vectors !"
+        )
     if window_size is None:
         window_size = len(directions_vectors)
     bounces = []
@@ -213,7 +263,8 @@ def detect_bounce_average_window(
             bounces.append(0)
         else:
             window = [
-                translate_values(abs(x)) for x in directions_vectors[i - window_size + 1 : i + 1]
+                translate_values(abs(x))
+                for x in directions_vectors[i - window_size + 1 : i + 1]
             ]
             avg = sum(window) / window_size
             print(window, avg)
@@ -225,7 +276,9 @@ def detect_bounce_average_window(
 
 
 def detect_bounce_near_zero(
-    direction_vectors: list[float], near_zero_count: list[int], threshold: int = 20
+    direction_vectors: list[float],
+    near_zero_count: list[int],
+    threshold: int = 20,
 ) -> list[int]:
     """
     detect_bounce_near_zero will detect if direction vector is near zero based on threshold value.
@@ -262,7 +315,10 @@ def find_middle_of_series(arr: list[int], min_series_length: int) -> int:
             end_index = idx
         else:
             if zero_detected:
-                if start_index != -1 and end_index - start_index + 1 >= min_series_length:
+                if (
+                    start_index != -1
+                    and end_index - start_index + 1 >= min_series_length
+                ):
                     break
                 else:
                     start_index = -1

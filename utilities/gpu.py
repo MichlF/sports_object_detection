@@ -1,6 +1,7 @@
 import os
-from tensorflow.keras import mixed_precision
+
 from tensorflow.config import experimental, list_physical_devices
+from tensorflow.keras import mixed_precision
 
 """
 Install tensorflow gpu support as win native. But note that this is not compatible with 
@@ -26,15 +27,25 @@ def init_gpu_tpu():
     """
     # Use mixed precision policy if TPU/GPUs are detected for additional performance boost
     # see https://www.tensorflow.org/guide/mixed_precision
-    if experimental.list_physical_devices("TPU"):  # Googles Tensor Processing Units
-        print("Available TPUs: ", len(experimental.list_physical_devices("TPU")))
-        mixed_precision.set_global_policy(mixed_precision.Policy("mixed_bfloat16"))
+    if experimental.list_physical_devices(
+        "TPU"
+    ):  # Googles Tensor Processing Units
+        print(
+            "Available TPUs: ", len(experimental.list_physical_devices("TPU"))
+        )
+        mixed_precision.set_global_policy(
+            mixed_precision.Policy("mixed_bfloat16")
+        )
     elif experimental.list_physical_devices("GPU"):  # NVidia GPU
-        print("Available GPUs: ", len(experimental.list_physical_devices("GPU")))
+        print(
+            "Available GPUs: ", len(experimental.list_physical_devices("GPU"))
+        )
         print(list_physical_devices("GPU"))
         print("Selecting the first GPU...")
         os.environ["CUDA_VISIBLE_DEVICES"] = "0"  # use the first GPU
-        mixed_precision.set_global_policy(mixed_precision.Policy("mixed_float16"))
+        mixed_precision.set_global_policy(
+            mixed_precision.Policy("mixed_float16")
+        )
     else:
         print("No TPUs or GPUs detected.")
     # Note: if mixed precision float16 is used, your output layer should be transferred to

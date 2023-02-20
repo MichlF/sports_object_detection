@@ -1,9 +1,12 @@
-from dataclasses import dataclass, field
 from collections import deque
+from dataclasses import dataclass, field
+
+import cv2
 import numpy as np
 import pandas as pd
-import cv2
+
 from utilities.timing import timer
+
 from .config import TIME_FUNCTIONS
 
 
@@ -70,7 +73,11 @@ class SimpleCentroidTracker:
                         **kwargs,
                     )
                 except Exception as e:
-                    print(" Couldn't draw path, see x,y: ", (path[i][0], path[i][1]), e)
+                    print(
+                        " Couldn't draw path, see x,y: ",
+                        (path[i][0], path[i][1]),
+                        e,
+                    )
         return image
 
     @timer(enabled=TIME_FUNCTIONS)
@@ -91,7 +98,8 @@ class SimpleCentroidTracker:
                     continue
                 ball_center = np.squeeze(
                     cv2.perspectiveTransform(
-                        path[i].reshape(-1, 1, 2).astype(np.float32), homography_mat
+                        path[i].reshape(-1, 1, 2).astype(np.float32),
+                        homography_mat,
                     )
                 ).astype(np.uint32)
                 try:
@@ -212,7 +220,10 @@ class PlayerPathTracker:
 
     @timer(enabled=TIME_FUNCTIONS)
     def update_path(
-        self, frame_no: int, player_positions: list[np.ndarray], player_ids: list[str]
+        self,
+        frame_no: int,
+        player_positions: list[np.ndarray],
+        player_ids: list[str],
     ):
         # Missing location for a given player id? Add a None
         for player_id in self.object_paths.keys():
@@ -222,7 +233,9 @@ class PlayerPathTracker:
         for idx in range(len(player_positions)):
             if player_ids[idx] not in self.object_paths:
                 self.object_paths[player_ids[idx]] = deque(maxlen=self.maxlen)
-            self.object_paths[player_ids[idx]].append((frame_no, player_positions[idx]))
+            self.object_paths[player_ids[idx]].append(
+                (frame_no, player_positions[idx])
+            )
 
     @timer(enabled=TIME_FUNCTIONS)
     def draw_player_paths(
@@ -250,12 +263,16 @@ class PlayerPathTracker:
                         cv2.circle(
                             image,
                             tuple(position[1:][0]),
-                            radius=int(radius/2),
-                            color=(0,0,0),
+                            radius=int(radius / 2),
+                            color=(0, 0, 0),
                             thickness=thickness,
                         )
                     except Exception as e:
-                        print(" Couldn't draw path, see x,y: ", tuple(position), e)
+                        print(
+                            " Couldn't draw path, see x,y: ",
+                            tuple(position),
+                            e,
+                        )
         return image
 
     @timer(enabled=TIME_FUNCTIONS)
@@ -274,18 +291,37 @@ class PlayerPathTracker:
                 if position[1:][0] is not None:
                     ball_center = np.squeeze(
                         cv2.perspectiveTransform(
-                            position[1:][0].reshape(-1, 1, 2).astype(np.float32), homography_mat
+                            position[1:][0]
+                            .reshape(-1, 1, 2)
+                            .astype(np.float32),
+                            homography_mat,
                         )
                     ).astype(np.uint32)
                     try:
                         cv2.circle(
-                            image, tuple(ball_center), radius, color, thickness, *args, **kwargs
+                            image,
+                            tuple(ball_center),
+                            radius,
+                            color,
+                            thickness,
+                            *args,
+                            **kwargs,
                         )
                         cv2.circle(
-                            image, tuple(ball_center), int(radius/2), (0,0,0), thickness, *args, **kwargs
+                            image,
+                            tuple(ball_center),
+                            int(radius / 2),
+                            (0, 0, 0),
+                            thickness,
+                            *args,
+                            **kwargs,
                         )
                     except Exception as e:
-                        print(" Couldn't draw 2D path, see x,y: ", tuple(ball_center), e)
+                        print(
+                            " Couldn't draw 2D path, see x,y: ",
+                            tuple(ball_center),
+                            e,
+                        )
         return image
 
     def retrieve_batch(self, current_frame: int, batch_size: int = None):
@@ -300,7 +336,9 @@ class PlayerPathTracker:
         else:  # search only a given batch
             start_frame = current_frame + 1 - batch_size
             for frame_no in range(start_frame, current_frame + 1):
-                data[frame_no] = {player_id: None for player_id in self.object_paths.keys()}
+                data[frame_no] = {
+                    player_id: None for player_id in self.object_paths.keys()
+                }
                 for player_id, player_path in self.object_paths.items():
                     for f, position in player_path:
                         if f == frame_no:
@@ -320,10 +358,12 @@ class PlayerPathTracker:
                     x_values.append(position[0])
                     y_values.append(position[1])
             x_cols = {
-                f"{player_id}_x": x_val for player_id, x_val in zip(positions.keys(), x_values)
+                f"{player_id}_x": x_val
+                for player_id, x_val in zip(positions.keys(), x_values)
             }
             y_cols = {
-                f"{player_id}_y": y_val for player_id, y_val in zip(positions.keys(), y_values)
+                f"{player_id}_y": y_val
+                for player_id, y_val in zip(positions.keys(), y_values)
             }
             row = {"frame_no": frame_no, **x_cols, **y_cols}
             self.player_locations = pd.concat(

@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def image_crop(
     image: np.ndarray,
     x1: int = None,
@@ -54,7 +55,9 @@ def image_crop(
         return image[y1 : y1 + height, x1 : x1 + width]
 
 
-def pixels_to_real(distance_px: int, reference_len_px: int, reference_len_world: float):
+def pixels_to_real(
+    distance_px: int, reference_len_px: int, reference_len_world: float
+):
     """
     Convert a distance from pixels to real-world units.
 
@@ -75,7 +78,9 @@ def pixels_to_real(distance_px: int, reference_len_px: int, reference_len_world:
     return distance_px * conversion_factor
 
 
-def real_to_pixels(distance_real: float, reference_len_px: int, reference_len_world: float):
+def real_to_pixels(
+    distance_real: float, reference_len_px: int, reference_len_world: float
+):
     """
     Convert a distance from real-world units to pixels.
 

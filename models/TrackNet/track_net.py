@@ -1,14 +1,14 @@
+from tensorflow.keras import Model
 from tensorflow.keras.layers import (
-    Conv2D,
     Activation,
     BatchNormalization,
-    MaxPooling2D,
-    UpSampling2D,
+    Conv2D,
     Input,
+    MaxPooling2D,
     Permute,
     Reshape,
+    UpSampling2D,
 )
-from tensorflow.keras import Model
 
 
 def track_net(
