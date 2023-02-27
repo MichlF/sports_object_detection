@@ -8,12 +8,8 @@ def image_crop(
     y2: int = None,
     width: int = None,
     height: int = None,
-    tensor_box_xywh: list[
-        int,
-    ] = None,
-    tensor_box_xyxy: list[
-        int,
-    ] = None,
+    tensor_box_xywh: list[int,] = None,
+    tensor_box_xyxy: list[int,] = None,
 ) -> np.ndarray:
     """
     Crops a rectangle out of a given image.

@@ -47,7 +47,6 @@ init_gpu_tpu()
 
 
 def process_video():
-
     frames_list, ball_list = [], []
 
     # Load input video, get info: fps, resolution, total frame count

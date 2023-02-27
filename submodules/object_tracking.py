@@ -55,7 +55,7 @@ class SimpleCentroidTracker:
         **kwargs,
     ):
         # ObjectID isn't implemented yet
-        for (objectID, path) in self.object_paths.items():
+        for objectID, path in self.object_paths.items():
             for i in range(max(1, len(path) - self.maxlen), len(path)):
                 if path[i - 1] is None or path[i] is None:
                     continue
@@ -85,7 +85,7 @@ class SimpleCentroidTracker:
         **kwargs,
     ):
         # ObjectID isn't implemented yet
-        for (objectID, path) in self.object_paths.items():
+        for objectID, path in self.object_paths.items():
             for i in range(max(1, len(path) - self.maxlen), len(path)):
                 if path[i - 1] is None or path[i] is None:
                     continue
